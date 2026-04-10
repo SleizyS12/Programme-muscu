@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PPUL — Force & Masse</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PPUL">
+<meta name="theme-color" content="#0d0d0d">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@400;600;800&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0d;
+  --s1: #161616;
+  --s2: #1f1f1f;
+  --border: rgba(255,255,255,0.08);
+  --push: #f55a5a;
+  --pull: #5a9ef5;
+  --upper: #c8f55a;
+  --legs: #f5a05a;
+  --text: #f0f0f0;
+  --muted: #777;
+  --rest: #444;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { background: var(--bg); color: var(--text); font-family: 'Barlow', sans-serif; min-height: 100vh; overflow-x: hidden; }
+
+.header { padding: 24px 20px 0; }
+.header-top { display: flex; justify-content: space-between; align-items: flex-start; }
+.header-label { font-size: 10px; letter-spacing: 0.15em; color: var(--muted); text-transform: uppercase; font-family: 'DM Mono', monospace; }
+.header-title { font-size: 32px; font-weight: 800; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.02em; line-height: 1; margin-top: 4px; }
+.header-sub { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: 'DM Mono', monospace; }
+.goal-badge { background: var(--s2); border: 1px solid var(--border); border-radius: 10px; padding: 8px 12px; text-align: right; }
+.goal-val { font-size: 13px; font-weight: 600; font-family: 'Barlow Condensed', sans-serif; }
+.goal-lbl { font-size: 10px; color: var(--muted); margin-top: 2px; font-family: 'DM Mono', monospace; }
+
+.legend { display: flex; gap: 12px; padding: 16px 20px 0; flex-wrap: wrap; }
+.leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+.leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+.nav { display: flex; gap: 4px; padding: 14px 20px 0; }
+.nav-btn { flex: 1; padding: 8px 4px; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; border: 1px solid var(--border); border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; font-family: 'Barlow Condensed', sans-serif; transition: all 0.2s; }
+.nav-btn.active { color: #0d0d0d; border-color: transparent; }
+.nav-btn.p-active { background: var(--push); }
+.nav-btn.pl-active { background: var(--pull); }
+.nav-btn.u-active { background: var(--upper); }
+.nav-btn.l-active { background: var(--legs); }
+.nav-btn.s-active { background: var(--text); }
+
+.section { display: none; padding: 16px 20px 100px; }
+.section.active { display: block; }
+
+/* Planning */
+.week-grid { display: flex; flex-direction: column; gap: 8px; }
+.day-row { background: var(--s1); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; display: flex; align-items: center; gap: 14px; }
+.day-row.highlight { border-color: rgba(255,255,255,0.15); }
+.day-circle { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.05em; flex-shrink: 0; }
+.day-info { flex: 1; }
+.day-name { font-size: 16px; font-weight: 600; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.03em; }
+.day-desc { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.day-tag { font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 20px; font-family: 'DM Mono', monospace; white-space: nowrap; }
+.note-card { background: var(--s1); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-top: 10px; }
+.note-title { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; font-family: 'DM Mono', monospace; margin-bottom: 8px; }
+.note-item { font-size: 13px; color: var(--text); line-height: 1.6; padding: 3px 0; display: flex; gap: 8px; }
+.note-dot { color: var(--muted); flex-shrink: 0; margin-top: 1px; }
+
+/* Séances */
+.session-header { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; padding: 16px; border-radius: 16px; }
+.session-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+.session-title { font-size: 24px; font-weight: 800; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.02em; line-height: 1; }
+.session-meta { font-size: 12px; margin-top: 3px; opacity: 0.7; font-family: 'DM Mono', monospace; }
+
+.exo-card { background: var(--s1); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; margin-bottom: 8px; }
+.exo-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px; }
+.exo-name { font-size: 16px; font-weight: 600; font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.02em; }
+.exo-sets { font-size: 14px; font-weight: 500; font-family: 'DM Mono', monospace; }
+.exo-detail { font-size: 12px; color: var(--muted); line-height: 1.5; }
+.exo-tip { font-size: 12px; margin-top: 6px; padding: 6px 10px; border-radius: 8px; background: var(--s2); line-height: 1.4; }
+.section-sep { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-family: 'DM Mono', monospace; margin: 14px 0 10px; }
+
+/* Conseils */
+.tip-card { background: var(--s1); border: 1px solid var(--border); border-radius: 14px; padding: 16px; margin-bottom: 10px; }
+.tip-num { font-size: 40px; font-weight: 800; color: var(--s2); font-family: 'Barlow Condensed', sans-serif; line-height: 1; margin-bottom: 6px; }
+.tip-title { font-size: 17px; font-weight: 600; font-family: 'Barlow Condensed', sans-serif; margin-bottom: 6px; letter-spacing: 0.02em; }
+.tip-desc { font-size: 13px; color: var(--muted); line-height: 1.7; }
+.tip-hl { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-label">Programme</div>
+      <div class="header-title">PUSH PULL<br>UPPER LEGS</div>
+      <div class="header-sub">Force + Masse · Salle · 45 min</div>
+    </div>
+    <div class="goal-badge">
+      <div class="goal-val">4 séances</div>
+      <div class="goal-lbl">/ semaine</div>
+      <div class="goal-val" style="margin-top:6px;">Deadlift</div>
+      <div class="goal-lbl">mouvement clé</div>
+    </div>
+  </div>
+</div>
+
+<div class="legend">
+  <div class="leg-item"><div class="leg-dot" style="background:var(--push)"></div>Push</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--pull)"></div>Pull</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--upper)"></div>Upper</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--legs)"></div>Legs</div>
+  <div class="leg-item"><div class="leg-dot" style="background:var(--rest)"></div>Repos</div>
+</div>
+
+<div class="nav">
+  <button class="nav-btn s-active active" onclick="showTab('planning',this,'s-active')">Plan</button>
+  <button class="nav-btn" onclick="showTab('push',this,'p-active')" style="color:var(--push);border-color:rgba(245,90,90,0.3)">Push</button>
+  <button class="nav-btn" onclick="showTab('pull',this,'pl-active')" style="color:var(--pull);border-color:rgba(90,158,245,0.3)">Pull</button>
+  <button class="nav-btn" onclick="showTab('upper',this,'u-active')" style="color:var(--upper);border-color:rgba(200,245,90,0.3)">Upper</button>
+  <button class="nav-btn" onclick="showTab('legs',this,'l-active')" style="color:var(--legs);border-color:rgba(245,160,90,0.3)">Legs</button>
+</div>
+
+<!-- PLANNING -->
+<div class="section active" id="tab-planning">
+  <div class="week-grid">
+    <div class="day-row highlight">
+      <div class="day-circle" style="background:rgba(245,90,90,0.15);color:var(--push)">LUN</div>
+      <div class="day-info">
+        <div class="day-name" style="color:var(--push)">Push</div>
+        <div class="day-desc">Pectoraux · Épaules · Triceps</div>
+      </div>
+      <span class="day-tag" style="background:rgba(245,90,90,0.15);color:var(--push)">45 min</span>
+    </div>
+    <div class="day-row">
+      <div class="day-circle" style="background:var(--s2);color:var(--muted)">MAR</div>
+      <div class="day-info">
+        <div class="day-name" style="color:var(--muted)">Repos ou running</div>
+      </div>
+      <span class="day-tag" style="background:var(--s2);color:var(--muted)">récup</span>
+    </div>
+    <div class="day-row highlight">
+      <div class="day-circle" style="background:rgba(90,158,245,0.15);color:var(--pull)">MER</div>
+      <div class="day-info">
+        <div class="day-name" style="color:var(--pull)">Pull</div>
+        <div class="day-desc">Dos · Biceps · Ischio</div>
+      </div>
+      <span class="day-tag" style="background:rgba(90,158,245,0.15);color:var(--pull)">45 min</span>
+    </div>
+    <div class="day-row">
+      <div class="day-circle" style="background:var(--s2);color:var(--muted)">JEU</div>
+      <div class="day-info">
+        <div class="day-name" style="color:var(--muted)">Repos ou running</div>
+      </div>
+      <span class="day-tag" style="background:var(--s2);color:var(--muted)">récup</span>
+    </div>
+    <div class="day-row highlight">
+      <div class="day-circle" style="background:rgba(200,245,90,0.15);color:var(--upper)">VEN</div>
+      <div class="day-info">
+        <div class="day-name" style="color:var(--upper)">Upper</div>
+        <div class="day-desc">Full haut du corps · Force</div>
+      </div>
+      <span class="day-tag" style="background:rgba(200,245,90,0.15);color:var(--upper)">45 min</span>
+    </div>
+    <div class="day-row">
+      <div class="day-circle" style="background:var(--s2);color:var(--muted)">SAM</div>
+      <div class="day-info">
+        <div class="day-name" style="color:var(--muted)">Repos ou running</div>
+      </div>
+      <span class="day-tag" style="background:var(--s2);color:var(--muted)">running</span>
+    </div>
+    <div class="day-row highlight">
+      <div class="day-circle" style="background:rgba(245,160,90,0.15);color:var(--legs)">DIM</div>
+      <div class="day-info">
+        <div class="day-name" style="color:var(--legs)">Renfo running</div>
+        <div class="day-desc">Ischio · Fessiers · Mollets · Gainage</div>
+      </div>
+      <span class="day-tag" style="background:rgba(245,160,90,0.15);color:var(--legs)">45 min</span>
+    </div>
+  </div>
+
+
+</div>
+
+<!-- PUSH -->
+<div class="section" id="tab-push">
+  <div class="session-header" style="background:rgba(245,90,90,0.1);">
+    <div class="session-icon" style="background:rgba(245,90,90,0.2);">💥</div>
+    <div>
+      <div class="session-title" style="color:var(--push)">Push</div>
+      <div class="session-meta" style="color:var(--push)">Pectoraux · Épaules · Triceps · 45 min</div>
+    </div>
+  </div>
+
+  <div class="section-sep">Force — mouvements composés</div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Développé couché barre</div>
+      <div class="exo-sets" style="color:var(--push)">5 × 5</div>
+    </div>
+    <div class="exo-detail">Repos 3 min · Charge lourde · Mouvement roi</div>
+    <div class="exo-tip" style="border-left:2px solid var(--push)">Progression : ajoute 2,5 kg dès que tu fais les 5×5 proprement</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Développé militaire barre</div>
+      <div class="exo-sets" style="color:var(--push)">4 × 6</div>
+    </div>
+    <div class="exo-detail">Repos 2 min · Debout ou assis · Strict, pas de triche</div>
+    <div class="exo-tip" style="border-left:2px solid var(--push)">Mouvement clé pour les épaules et la force globale du haut</div>
+  </div>
+
+  <div class="section-sep">Hypertrophie — volume</div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Dips</div>
+      <div class="exo-sets" style="color:var(--push)">3 × 8–10</div>
+    </div>
+    <div class="exo-detail">Repos 90 sec · Penche-toi en avant pour cibler les pecs</div>
+    <div class="exo-tip" style="border-left:2px solid var(--push)">Penche-toi en avant pour cibler les pecs, reste droit pour les triceps</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Élévations latérales haltères</div>
+      <div class="exo-sets" style="color:var(--push)">3 × 12–15</div>
+    </div>
+    <div class="exo-detail">Repos 60 sec · Charge légère · Contrôle total</div>
+    <div class="exo-tip" style="border-left:2px solid var(--push)">Coudes légèrement fléchis, monte jusqu'à l'horizontale max</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Triceps poulie haute</div>
+      <div class="exo-sets" style="color:var(--push)">3 × 12</div>
+    </div>
+    <div class="exo-detail">Repos 60 sec · Corde ou barre droite</div>
+    <div class="exo-tip" style="border-left:2px solid var(--push)">Finisher — contracte fort en bas, descente contrôlée</div>
+  </div>
+</div>
+
+<!-- PULL -->
+<div class="section" id="tab-pull">
+  <div class="session-header" style="background:rgba(90,158,245,0.1);">
+    <div class="session-icon" style="background:rgba(90,158,245,0.2);">🔵</div>
+    <div>
+      <div class="session-title" style="color:var(--pull)">Pull</div>
+      <div class="session-meta" style="color:var(--pull)">Dos · Biceps · Ischio · 45 min</div>
+    </div>
+  </div>
+
+  <div class="section-sep">Force — mouvements composés</div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Rowing barre penché</div>
+      <div class="exo-sets" style="color:var(--pull)">5 × 5</div>
+    </div>
+    <div class="exo-detail">Repos 3 min · Charge lourde · Dos plat obligatoire</div>
+    <div class="exo-tip" style="border-left:2px solid var(--pull)">Antagoniste du développé couché — aussi important que le bench</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Tractions</div>
+      <div class="exo-sets" style="color:var(--pull)">4 × 6</div>
+    </div>
+    <div class="exo-detail">Repos 2 min · Prise pronation · Amplitude complète</div>
+    <div class="exo-tip" style="border-left:2px solid var(--pull)">Amplitude complète — bras tendus en bas, menton au-dessus de la barre</div>
+  </div>
+
+  <div class="section-sep">Hypertrophie — volume</div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Tirage poitrine poulie haute</div>
+      <div class="exo-sets" style="color:var(--pull)">3 × 10–12</div>
+    </div>
+    <div class="exo-detail">Repos 90 sec · Prise large · Tire vers le menton</div>
+    <div class="exo-tip" style="border-left:2px solid var(--pull)">Bascule légèrement en arrière, ouvre la poitrine en haut</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Curl barre EZ</div>
+      <div class="exo-sets" style="color:var(--pull)">3 × 10</div>
+    </div>
+    <div class="exo-detail">Repos 60 sec · Coudes fixes · Pas de balancement</div>
+    <div class="exo-tip" style="border-left:2px solid var(--pull)">Supination en haut — contracte fort le bicep</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Face pull</div>
+      <div class="exo-sets" style="color:var(--pull)">3 × 15</div>
+    </div>
+    <div class="exo-detail">Repos 60 sec · Poulie haute · Protection des épaules</div>
+    <div class="exo-tip" style="border-left:2px solid var(--pull)">Indispensable pour équilibrer le travail de Push et prévenir les blessures</div>
+  </div>
+</div>
+
+<!-- UPPER -->
+<div class="section" id="tab-upper">
+  <div class="session-header" style="background:rgba(200,245,90,0.08);">
+    <div class="session-icon" style="background:rgba(200,245,90,0.15);">⚡</div>
+    <div>
+      <div class="session-title" style="color:var(--upper)">Upper</div>
+      <div class="session-meta" style="color:var(--upper)">Full haut du corps · Force max · 45 min</div>
+    </div>
+  </div>
+
+  <div class="section-sep">Force — lourds et composés</div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Développé incliné haltères</div>
+      <div class="exo-sets" style="color:var(--upper)">4 × 6</div>
+    </div>
+    <div class="exo-detail">Repos 2–3 min · 30–45° · Amplitude maximale</div>
+    <div class="exo-tip" style="border-left:2px solid var(--upper)">Variation du bench — cible le haut des pectoraux</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Rowing 1 bras haltère</div>
+      <div class="exo-sets" style="color:var(--upper)">4 × 8</div>
+    </div>
+    <div class="exo-detail">Repos 90 sec · Genou sur banc · Tire haut vers la hanche</div>
+    <div class="exo-tip" style="border-left:2px solid var(--upper)">Meilleur exercice de dos unilatéral — corrige les déséquilibres</div>
+  </div>
+
+  <div class="section-sep">Force + hypertrophie</div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Développé épaules haltères</div>
+      <div class="exo-sets" style="color:var(--upper)">3 × 8</div>
+    </div>
+    <div class="exo-detail">Repos 90 sec · Assis · Descend jusqu'aux oreilles</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Curl marteau haltères</div>
+      <div class="exo-sets" style="color:var(--upper)">3 × 10</div>
+    </div>
+    <div class="exo-detail">Repos 60 sec · Prise neutre · Cible le brachial</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Extensions triceps couché</div>
+      <div class="exo-sets" style="color:var(--upper)">3 × 10</div>
+    </div>
+    <div class="exo-detail">Repos 60 sec · Barre EZ · Skull crusher</div>
+    <div class="exo-tip" style="border-left:2px solid var(--upper)">Descend la barre vers le front, coudes fixes</div>
+  </div>
+</div>
+
+<!-- LEGS -->
+<div class="section" id="tab-legs">
+  <div class="session-header" style="background:rgba(245,160,90,0.1);">
+    <div class="session-icon" style="background:rgba(245,160,90,0.2);">🏃</div>
+    <div>
+      <div class="session-title" style="color:var(--legs)">Renfo running</div>
+      <div class="session-meta" style="color:var(--legs)">Prévention · Puissance · Stabilité · 45 min</div>
+    </div>
+  </div>
+
+  <div class="section-sep">Puissance propulsive</div>
+
+  <div class="exo-card" style="border-color:rgba(245,160,90,0.3);">
+    <div class="exo-header">
+      <div class="exo-name">Deadlift roumain barre</div>
+      <div class="exo-sets" style="color:var(--legs)">4 × 8</div>
+    </div>
+    <div class="exo-detail">Repos 2 min · Charge modérée · Amplitude complète</div>
+    <div class="exo-tip" style="border-left:2px solid var(--legs)">Ischio-jambiers forts = meilleure propulsion et moins de blessures. Mouvement clé du runner.</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Fentes bulgares haltères</div>
+      <div class="exo-sets" style="color:var(--legs)">3 × 8/jambe</div>
+    </div>
+    <div class="exo-detail">Repos 90 sec · Pied arrière sur banc · Descente contrôlée</div>
+    <div class="exo-tip" style="border-left:2px solid var(--legs)">Unilatéral = corrige les déséquilibres gauche/droite fréquents chez les coureurs</div>
+  </div>
+
+  <div class="section-sep">Stabilité & gainage</div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Hip thrust barre</div>
+      <div class="exo-sets" style="color:var(--legs)">4 × 12</div>
+    </div>
+    <div class="exo-detail">Repos 90 sec · Charge progressive · Contraction fessiers en haut</div>
+    <div class="exo-tip" style="border-left:2px solid var(--legs)">Fessiers puissants = vitesse + protection du genou et du dos en course</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Pont fessier unilatéral</div>
+      <div class="exo-sets" style="color:var(--legs)">3 × 15/jambe</div>
+    </div>
+    <div class="exo-detail">Repos 60 sec · Au sol · Hanche bien montée · Pause 1 sec en haut</div>
+    <div class="exo-tip" style="border-left:2px solid var(--legs)">Stabilise le bassin à chaque foulée — prévient le syndrome de la bandelette</div>
+  </div>
+
+  <div class="section-sep">Mollets & chevilles</div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Mollets debout unilatéral</div>
+      <div class="exo-sets" style="color:var(--legs)">4 × 12/jambe</div>
+    </div>
+    <div class="exo-detail">Repos 60 sec · Sur une marche · Amplitude complète</div>
+    <div class="exo-tip" style="border-left:2px solid var(--legs)">Eccentric drop : monte sur 2 pieds, descend sur 1. Prévention tendinite d'Achille.</div>
+  </div>
+
+  <div class="exo-card">
+    <div class="exo-header">
+      <div class="exo-name">Gainage latéral + abduction</div>
+      <div class="exo-sets" style="color:var(--legs)">3 × 30 sec/côté</div>
+    </div>
+    <div class="exo-detail">Repos 45 sec · Planche latérale + lever de hanche</div>
+    <div class="exo-tip" style="border-left:2px solid var(--legs)">Stabilise le bassin en course — élimine le dandinement qui coûte de l'énergie</div>
+  </div>
+</div>
+
+<script>
+  let currentActive = 's-active';
+  function showTab(name, btn, activeClass) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => {
+      b.classList.remove('active','p-active','pl-active','u-active','l-active','s-active');
+      b.style.color = '';
+    });
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active', activeClass);
+    currentActive = activeClass;
+  }
+</script>
+</body>
+</html>
